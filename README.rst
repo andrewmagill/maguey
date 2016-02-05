@@ -4,6 +4,9 @@ Maguey
 
 Unofficial `Agave API`_ SDK for Python.
 
+.. image:: https://travis-ci.org/andrewmagill/maguey.svg?branch=master
+    :target: https://travis-ci.org/andrewmagill/maguey
+
 Installation
 ============
 
