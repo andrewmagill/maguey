@@ -1,0 +1,17 @@
+language: python
+sudo: false
+python:
+    - '2.7'
+deploy:
+  provider: pypi
+  user: andrewmagill
+  password:
+    secure: hZiw5o4457/c2YW98wDIWknmkkcVkBJg6ZmO9AZeLsLfOowSb9ccYqGKyWINFpZLvqaq6PFwqpgPqE7emY2nRpNATW84Pbmv25oNlMk9x3/LI4a1La0gOnCz1wxCk7jmZ+UVkB6y6wAy6sRn38Uib6/YesxktsmiTSf/+/JPnA5KfD8uEB4E1DPYWvbOn7vxLVxiBfzQ5Zs3I1T366qmYvAVafqOFWnYIorgVFtL7FwIvOF51BKtGuGM7n4rYNLiGCNlWvLXQCPhuSiy2VMp6dvzxov3ndUDFHfhtUjYr3Ow78tGo+DKw+qfLT8ma+yw4IVxR5nsvzxt4cdVyyvlXSSX275P/g+V+s12vRGg+SC5Mm9jy4yHAsjNk8hxK3aY5r9tAETgGH37SYbzLyVuIilsTpwh3Pgk/kZ6L4bVRshIEiN0lQ0ISmcjR0WWdbQxF0/jTsNnDjpR6oRX3+FM3kY74/2riVf+uk3hA6MYMm2sXhMctaoW1sfN2thTkiYLqxWeMjUZQJqgblqIAKLQMLHtHH6Gw5hYxwvCFULm/s/i+zw7M6vJxOCoDmWYGODQhugI07csOJH977MvboSbR9ZYcinSykRPB4B8UHmSjT7qpaqE5FF3vKLMxuJrjrv9+ZFVXTRCN+AtZDNzA88/28mSmNK88AB03gqDAl/oo+c=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: andrewmagill/maguey
+install:
+    - python setup.py install
+script:
+    - python setup.py nosetests
