@@ -23,6 +23,7 @@ setup(
     packages=['maguey'],
     install_requires=[
         'markdown',
+        'requests'
     ],
     test_suite='nose.collector',
     tests_require=['nose'],

@@ -1,9 +1,9 @@
 from unittest import TestCase
 
 import maguey
-class TestFiles(TestCase):
-    def test_add_file(self):
+class TestProfiles(TestCase):
+    def test_add_profile(self):
         pass
 
-    def test_delete_file(self):
+    def test_delete_profile(self):
         pass
