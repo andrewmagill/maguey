@@ -2,7 +2,7 @@
 Maguey
 ======
 
-Unofficial `Agave API`_. SDK for Python.
+Unofficial `Agave API`_ SDK for Python.
 
 Installation
 ============
