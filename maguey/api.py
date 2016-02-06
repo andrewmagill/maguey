@@ -9,37 +9,52 @@ class Notifications(object):
     pass
 
 class Meta(object):
+    def __init__(self, **kwargs):
+        for k, v in kwargs.iteritems():
+            try:
+                assert(k not in dir(self))
+                setattr(self, k, v)
+            except:
+                raise Exception('key conflict: {}'.format(k))
+
     @staticmethod
-    def list(token, uuid=None, query=None):
-        """Returns json list of metadata.
+    def list(token, query=None, **kwargs):
+        """Returns list of metadata objects.
 
         Parameters:
             token   (required)  -   bearer token
-            uuid    (optional)  -   get metadata by uuid
             query   (optional)  -   must be valid mongodb query
 
             Example query:
-                query = '{"uuid":"2258583735108243941-ee4acae9fffff7a7-0001-012"}'
+                query = '{"name":"idsvc.project"}'
 
         Returns:
-            List of JSON metadata objects with the following fields:
+            List of metadata objects with the following fields:
 
             associationIds - IDs of associated metadata objects
-            owner - most likely the user who created the metadata
+            created - metadata object creation date
+            internalUsername - system specific username
+            lastUpdated - metadata object last updated
             name - often used to refer to the type of object the metadata describes
-            schemaId - ...
-            value - usually contains another JSON object
+            owner - most likely the user who created the metadata
+            schemaId - metadata schemata id
+            uuid - unique identifier for metadata object
+            value - usually contains a JSON object
         """
         if not token or token == '':
             raise ValueError("token is a required parameter")
 
         method_path = "meta/v2/data"
         parameters = None
+        uuid = None
 
         if query:
             if type(query) == 'dict':
                 query = json.dumps(query)
             parameters = {'q': query}
+
+        if 'uuid' in kwargs.keys():
+            uuid = kwargs['uuid']
 
         url = "{base}/{method}/{uuid}".format(
             base = AGAVE_TENANT_BASEURL,
@@ -49,8 +64,67 @@ class Meta(object):
 
         headers = {'Authorization': 'Bearer {}'.format(token)}
 
-        result = requests.get(url, headers=headers, params=parameters)
-        return result.json()
+        response = requests.get(url, headers=headers, params=parameters)
+
+        try:
+            if response.status_code == 400:
+                raise Exception('Invalid JSON query')
+            if response.status_code == 401:
+                raise Exception('User is not authorized')
+            if response.status_code == 402:
+                raise Exception('Failed to authenticate user')
+            if response.status_code == 403:
+                raise Exception('The specified metadata cannot be found')
+            if response.status_code == 404:
+                raise Exception('The service was unable to query the metadata database')
+        except Exception as e:
+            raise Exception('invalid object from server')
+
+        try:
+            response = response.json()
+            if response['status'] == 'error':
+                raise Exception(response['message'])
+        except Exception as e:
+            raise Exception('invalid object from server')
+
+        result = response['result']
+
+        if type(result) == 'list':
+            result_list = []
+            for item in result:
+                result_list.append(Meta(**item))
+            return result_list
+        else:
+            return Meta(**result)
+
+    @staticmethod
+    def get(token, uuid):
+        """Returns a metadata object.
+
+        Parameters:
+            token   (required)  -   bearer token
+            uuid    (required)  -   get metadata by uuid
+
+        Returns:
+            A metadata object with the following fields:
+
+            associationIds - IDs of associated metadata objects
+            created - metadata object creation date
+            internalUsername - system specific username
+            lastUpdated - metadata object last updated
+            name - often used to refer to the type of object the metadata describes
+            owner - most likely the user who created the metadata
+            schemaId - metadata schemata id
+            uuid - unique identifier for metadata object
+            value - usually contains a JSON object
+        """
+        if not token or token == '':
+            raise ValueError("token is a required parameter")
+
+        if not uuid or uuid == '':
+            raise ValueError("uuid is a required parameter")
+
+        return Meta.list(token, uuid=uuid)
 
     @staticmethod
     def _add_update(token, body, uuid=None):
